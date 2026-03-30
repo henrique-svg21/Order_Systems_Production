@@ -29,10 +29,8 @@ def init_db():
     #Cursor() allows execution of SQL commands
     cursor = conn.cursor()
     
-    #IF NOT EXISTS ensures commands susceptibility
-    
     cursor.execute('''
-                   CREATE TABLE orders (
+                   CREATE TABLE IF NOT EXISTS orders (
                        id INTEGER PRIMARY KEY AUTOINCREMENT,
                         product TEXT NOT NULL,
                         quantity INTEGER NOT NULL,
@@ -45,5 +43,4 @@ def init_db():
     conn.commit()
     print("Database successfully inicialized!")
     
-
-init_db()
+    
