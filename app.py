@@ -49,7 +49,27 @@ def list_orders():
     
     return jsonify([dict(o) for o in orders])
 
-#Starting points
+#route by id (get)
+@app.route('/orders/<int:order_id>', methods=['GET'])
+def fetch_orderId():
+    '''
+    Get an unique production order by its id
+    URL parameters:
+        - order id (int)
+    
+    returns:
+        - 200 + JSON, if found
+        - 404 + error message, if not found
+    '''
+
+conn = get_connection()
+cursor = conn.cursor()
+cursor.execute('SELECT * FROM orders WHERE id = ?') #? cause it varies based on id
+order = cursor.fetchone()
+conn.close()
+
+
+#Starting point
 
 if __name__ == '__main__':
     init_db()
