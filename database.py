@@ -35,12 +35,13 @@ def init_db():
                         product TEXT NOT NULL,
                         quantity INTEGER NOT NULL,
                         status TEXT DEFAULT 'Pendent',
-                        created_at TEXT DEFAULT (datetime(NOW(), 'localtime')) 
+                        created_at TEXT DEFAULT (datetime('now', 'localtime')) 
                     );  
                    ''')
     
     #commit() SAVES changes in .db file
     conn.commit()
     print("Database successfully inicialized!")
-    
+
+init_db()
     
