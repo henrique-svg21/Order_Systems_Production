@@ -219,6 +219,24 @@ def remove_order(order_id):
     conn.close()
     return jsonify({'message': f'Order {order_id} ({product_name}) successfully removed.', 'removed_id': order_id}), 200
 
+# SPECIAL ROUTE: FILTERING STATUS
+@app.route('/orders', methods=['GET'])
+def filtering_orders():
+    # request.args access parameters for string query
+    filter = request.args.get('status')
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    if filter:
+        cursor.execute('SELECT * FROM orders WHERE status = ? ORDER BY id DESC', (filter,))
+
+    else:
+        cursor.execute('SELECT * FROM orders ORDER BY id DESC')
+
+    orders = cursor.fetchall()
+    conn.close()
+    return jsonify([dict(o) for o in orders])
+
 #running loop
 
 if __name__ == '__main__':
