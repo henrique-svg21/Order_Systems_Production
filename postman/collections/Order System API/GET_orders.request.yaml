@@ -1,4 +1,0 @@
-$kind: http-request
-url: http://127.0.0.1:5000/orders
-method: GET
-order: 4120011734117102
