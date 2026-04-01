@@ -1,4 +1,4 @@
-#creation and settings for SQLite database
+#creation and settings for SQLite database (run once)
 import sqlite3
 
 #constant with name of the database created on postgree
