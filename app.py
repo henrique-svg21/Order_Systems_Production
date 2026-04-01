@@ -219,7 +219,7 @@ def remove_order(order_id):
     conn.close()
     return jsonify({'message': f'Order {order_id} ({product_name}) successfully removed.', 'removed_id': order_id}), 200
 
-# SPECIAL ROUTE: FILTERING STATUS
+# SPECIAL ROUTE: FILTERING STATUS (NOT WORKING)
 @app.route('/orders', methods=['GET'])
 def filtering_orders():
     # request.args access parameters for string query
