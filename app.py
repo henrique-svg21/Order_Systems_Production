@@ -136,6 +136,56 @@ def create_order():
     # Returns 201 Created completed registered
     return jsonify(dict(new_order)), 201
 
+# update orders' status (PUT)
+@app.route('/orders/<int:order_id>', methods=['PUT'])
+def update_order(order_id):
+    """
+    Updates existent production order
+    URL parameters:
+        order_id (int)
+        expected body (JSON)
+        status (str): New status. Allowed: 'Pendent', 'In progress', 'Done'.
+    Returns:
+        200 + updated order's JSON
+        400 + error if invalid
+        404 + error if order not found
+    """
+    dados = request.get_json()
+    if not dados:
+        return jsonify({'error': 'Requisitions body absent or invalid.'}), 400
+    
+    # Validates status field
+    valid_status = ['Pendent', 'In progress', 'Done']
+    new_status = dados.get('status', '').strip()
+
+    if not new_status:
+        return jsonify({'error': 'Field "status" is mandatory.'}), 400
+    
+    if new_status not in valid_status:
+        return jsonify({'error': f'Invalid status. Allowed values:{valid_status}'}), 400
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Checks order's veracity and tries to update it
+    cursor.execute('SELECT id FROM orders WHERE id = ?', (order_id,))
+    if cursor.fetchone() is None:
+        conn.close()
+        return jsonify({'error': f'Order{order_id} not found.'}),404
+    
+    # executes 
+    cursor.execute(
+    'UPDATE orders SET status = ? WHERE id = ?',(new_status, order_id))
+    conn.commit()
+    conn.close()
+
+    # Returns updated register
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM orders WHERE id = ?', (order_id,))
+    updated_order = cursor.fetchone()
+    conn.close()
+    return jsonify(dict(updated_order)), 200
 
 #running loop
 
