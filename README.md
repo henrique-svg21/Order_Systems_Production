@@ -5,4 +5,5 @@ SQLite Viewer
 HTML
 CSS
 JavaScript
+Rest client
 #

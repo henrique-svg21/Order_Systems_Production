@@ -187,6 +187,38 @@ def update_order(order_id):
     conn.close()
     return jsonify(dict(updated_order)), 200
 
+#route for deleating existent order (DELETE)
+@app.route('/orders/<int:order_id>', methods=['DELETE'])
+def remove_order(order_id):
+    """
+    Permanently removes a production order by id
+    URL parameters:
+        order_id (int)
+    Returns:
+        200 + confirmation message
+        404 + error in case order is not found
+    """
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Verifies existent BEFORE deleting
+    cursor.execute('SELECT id, product FROM orders WHERE id = ?',(order_id,))
+    order = cursor.fetchone()
+
+    if order is None:
+        conn.close()
+        return jsonify({'error': f'Order {order_id} not found.'}),404
+
+    # Keeps product name, as it will be used for confirmation message
+    product_name = order['product']
+
+    # Removes   
+    cursor.execute('DELETE FROM orders WHERE id = ?', (order_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': f'Order {order_id} ({product_name}) successfully removed.', 'removed_id': order_id}), 200
+
 #running loop
 
 if __name__ == '__main__':
