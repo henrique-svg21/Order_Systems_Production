@@ -1,3 +1,8 @@
 #
-in progress
+Libraries for VS code:
+Python
+SQLite Viewer
+HTML
+CSS
+JavaScript
 #
