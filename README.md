@@ -78,7 +78,7 @@ source venv/bin/activate
 
 Once activated, your terminal prompt will show `(venv)` at the beginning, confirming the environment is active.
 
-### 3. Deactivate when done
+### 3. Deactivate when done coding
 
 ```bash
 deactivate
@@ -104,7 +104,7 @@ The `requirements.txt` file lists every external Python library that this projec
 
 ### Install all dependencies at once
 
-With your virtual environment **active**, run:
+With your virtual environment **active**, run (you might need to upgrade your pip first):
 
 ```bash
 pip install -r requirements.txt
