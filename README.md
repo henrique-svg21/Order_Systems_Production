@@ -40,6 +40,7 @@ Install the following extensions from the VS Code Marketplace (`Ctrl+Shift+X`):
 | **CSS** | Styling support for the frontend |
 | **JavaScript** | JS language support for the frontend scripts |
 | **Rest Client** | Send HTTP requests to the API directly from `.http` files inside VS Code |
+| **Git Lens** | Provides deep insight into code history, authorship and collaborative workflows |
 
 > 💡 **Tip:** You can install all of them quickly by searching their names in the Extensions panel (`Ctrl+Shift+X`).
 
