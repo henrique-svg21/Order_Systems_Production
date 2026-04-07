@@ -34,7 +34,7 @@ def status():
         "system": "Order System's Production",
         "version": "2.0.0",
         "total_orders": result["total"],
-        "timestamp": datetime.now().strtime("%Y-%d-%d%H:%M:%S"),
+        "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "message": "Hello, factory, API working!"
     })
 
