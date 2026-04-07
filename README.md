@@ -214,10 +214,6 @@ DELETE http://localhost:5000/orders/1
 
 Click **Send Request** above each block to execute it directly in VS Code.
 
-### Option 2 — Postman
-
-A ready-to-import Postman collection is included in the `postman/collections/Order System API/` folder. Import it into Postman to get all endpoints pre-configured.
-
 ---
 
 ## 🙈 Version Control & `.gitignore`
