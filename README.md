@@ -12,7 +12,7 @@ Order_Systems_Production/
 ├── database.py         # SQLite database initialization and connection
 ├── orders.db           # SQLite database file (auto-generated on first run)
 ├── requirements.txt    # Python dependencies
-├── static/             # Frontend files (HTML, CSS, JS) served by Flask
+├── static/             # Frontend file (HTML, CSS, JS) served by Flask
 ├── postman/            # Postman collection for API testing
 ├── .gitignore          # Files and folders excluded from version control
 └── README.md           # This file
