@@ -214,6 +214,50 @@ DELETE http://localhost:5000/orders/1
 
 Click **Send Request** above each block to execute it directly in VS Code.
 
+### Option 2 — Postman
+
+If you prefer using a dedicated GUI for API testing, you can easily set up Postman to interact with your local server. 
+
+**1. Create a New Collection**
+- Open Postman and click **+ New** > **Collection**.
+- Name it something like "Order Systems API".
+
+**2. Add Requests**
+Right-click your new collection and select **Add Request** for each of the following actions. Make sure your Flask server (`python app.py`) is running before hitting **Send**!
+
+- **Get All Orders:**
+  - **Method:** `GET`
+  - **URL:** `http://localhost:5000/orders`
+  - Click **Send** to see your database records.
+
+- **Create a New Order:**
+  - **Method:** `POST`
+  - **URL:** `http://localhost:5000/orders`
+  - Go to the **Body** tab, select **raw**, and change the format dropdown from Text to **JSON**.
+  - Paste the following payload and click **Send**:
+    ```json
+    {
+      "product": "Wheel Hub",
+      "quantity": 100
+    }
+    ```
+
+- **Update an Order Status:**
+  - **Method:** `PUT`
+  - **URL:** `http://localhost:5000/orders/1` *(Replace '1' with an existing order ID)*
+  - Go to the **Body** tab, select **raw** > **JSON**.
+  - Paste the following payload and click **Send**:
+    ```json
+    {
+      "status": "In progress"
+    }
+    ```
+
+- **Delete an Order:**
+  - **Method:** `DELETE`
+  - **URL:** `http://localhost:5000/orders/1` *(Replace '1' with the ID you want to delete)*
+  - Click **Send** to permanently remove the record.
+
 ---
 
 ## 🙈 Version Control & `.gitignore`
