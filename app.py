@@ -3,12 +3,42 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from database import init_db, get_connection
 import datetime
+from dotenv import load_dotenv 
+import os
+
+load_dotenv() #load env file
 
 #creates an Flash's application instance 
 app = Flask(__name__, static_folder='static', static_url_path='')
 
 #Habilitate CORS
 CORS(app)
+
+#Security key
+API_KEY = os.environ.get('API_KEY') 
+
+def authentication(f):
+    """
+    Formatter which protects routes, requires valid API key
+    Client must send header:
+        X-API-Key: <API_KEY value set>
+        If correct, executes route function as usual
+        If incorrect or non-existing, return 401 Unauthorized
+    Use:
+    @app.route('/route')
+    @authentication
+    """
+    @wraps(f) # Preserva o nome e docstring da funcao original
+    def formatter(*args, **kwargs):
+        # Reads X-API-Key's requisition header 
+        received_key = request.headers.get('X-API-Key')
+        if not received_key:
+            return jsonify({'error': 'Authentication needed.','instruction': 'Send X-API-Key header with your key.'}), 401
+        if received_key != API_KEY:
+            return jsonify({'error': 'API Key invalid or expired.'}), 403
+        # Correct key: executes route function
+        return f(*args, **kwargs)
+    return formatter
 
 #route n1 - dashboard
 @app.route('/')
@@ -20,6 +50,7 @@ def index():
 
 #route n2 - API status
 @app.route('/status')
+#@authentication
 def status():
     '''
     API's verification route (health). 
@@ -40,6 +71,7 @@ def status():
 
 #route n3 - list all orders (get)
 @app.route('/orders', methods=['GET'])
+#@authentication
 def list_orders():
     '''
     list all registered production orders
@@ -58,6 +90,7 @@ def list_orders():
 
 #route by id (get)
 @app.route('/orders/<int:order_id>', methods=['GET'])
+@authentication
 def fetch_orderId(order_id):
     '''
     Get an unique production order by its id
@@ -83,6 +116,7 @@ def fetch_orderId(order_id):
 
 # post to create a new production route
 @app.route('/orders', methods=['POST'])
+@authentication
 def create_order():
     """
     Create a new production order on top of JSON data sent
@@ -145,6 +179,7 @@ def create_order():
 
 # update orders' status (PUT)
 @app.route('/orders/<int:order_id>', methods=['PUT'])
+@authentication
 def update_order(order_id):
     """
     Updates existent production order
@@ -196,6 +231,7 @@ def update_order(order_id):
 
 #route for deleating existent order (DELETE)
 @app.route('/orders/<int:order_id>', methods=['DELETE'])
+@authentication
 def remove_order(order_id):
     """
     Permanently removes a production order by id
