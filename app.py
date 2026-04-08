@@ -1,3 +1,16 @@
+'''
+app.py - Back-End Flask, Orders Systems Production
+
+API REST with complete CRUD, authentication via API Key, 
+Global Error Handling and Input Sanitization
+
+Author: Henrique Schorck
+Date: 08/04/2026
+Version: 2.0.0
+SENAI Jaraguá do Sul = Technician in Cybersystems for Automation
+'''
+
+
 #backend flask: API REST's routes
 from flask import Flask, jsonify, request
 import html
@@ -147,14 +160,14 @@ def create_order():
         return jsonify({'error': 'Requisitions body invalid or noexistent'}), 400
     
     # Verifies obligatory field 'product'
-    product = data.get('product', '').strip()
-    product = html.escape
+    gross_product = data.get('product', '')
+    product = html.escape(gross_product.strip())
     if not product:
         return jsonify({'error': 'Field "product" is mandatory.'}), 400
     
-    #Verifies if product name is shorter than 50
-    if len(product) > 50:
-        return jsonify({'error': 'Product name exceeds maximum length of 50 characters.'}), 400
+    #Verifies if product name is shorter than 200
+    if len(product) > 200:
+        return jsonify({'error': 'Product name exceeds maximum length of 200 characters.'}), 400
 
     # Verifies obligatory field 'quantity' 
     quantity = data.get('quantity')
@@ -285,4 +298,3 @@ if __name__ == '__main__':
     init_db()
     
     app.run(debug=True, host='0.0.0.0', port=5000)
-    
