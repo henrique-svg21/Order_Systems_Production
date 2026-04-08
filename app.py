@@ -113,10 +113,7 @@ def list_orders():
     
     return jsonify([dict(o) for o in orders])
 
-#route by id (get)
-@app.route('/orders/<int:order_id>', methods=['GET'])
-@authentication
-def fetch_orderId(order_id):
+
     '''
     Get an unique production order by its id
     URL parameters:
