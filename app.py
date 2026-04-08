@@ -84,7 +84,7 @@ def status():
         "message": "Hello, factory, API working!"
     })
 
-# route n3 - list all orders and filter (GET)
+#route n3 - list all orders and filter (GET)
 @app.route('/orders', methods=['GET'])
 @authentication
 def list_orders():
@@ -136,7 +136,7 @@ def list_orders():
     else:
         return jsonify(dict(order)), 200
 
-# post to create a new production route
+#n4 post to create a new production route (POST)
 @app.route('/orders', methods=['POST'])
 @authentication
 def create_order():
@@ -204,7 +204,7 @@ def create_order():
     # Returns 201 Created completed registered
     return jsonify(dict(new_order)), 201
 
-# update orders' status (PUT)
+#n5 update orders' status (PUT)
 @app.route('/orders/<int:order_id>', methods=['PUT'])
 @authentication
 def update_order(order_id):
@@ -256,7 +256,7 @@ def update_order(order_id):
     conn.close()
     return jsonify(dict(updated_order)), 200
 
-#route for deleating existent order (DELETE)
+#n6 route for deleating existent order (DELETE)
 @app.route('/orders/<int:order_id>', methods=['DELETE'])
 @authentication
 def remove_order(order_id):
