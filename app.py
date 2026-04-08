@@ -1,6 +1,7 @@
 #backend flask: API REST's routes
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from functools import wraps
 from database import init_db, get_connection
 import datetime
 from dotenv import load_dotenv 
@@ -69,20 +70,30 @@ def status():
         "message": "Hello, factory, API working!"
     })
 
-#route n3 - list all orders (get)
+# route n3 - list all orders and filter (GET)
 @app.route('/orders', methods=['GET'])
-#@authentication
+@authentication
 def list_orders():
     '''
-    list all registered production orders
+    List all registered production orders, with an optional status filter.
     method http: get
-    URL: https://localhost:5000/orders
+    URL: http://localhost:5000/orders
+         http://localhost:5000/orders?status=Pending
     Returns: list and orders in JSON format
     '''
+    # request.args access parameters for string query
+    status_filter = request.args.get('status')
     
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM orders ORDER BY id DESC')
+    
+    if status_filter:
+        # If the user passed ?status=something, filter by it
+        cursor.execute('SELECT * FROM orders WHERE status = ? ORDER BY id DESC', (status_filter,))
+    else:
+        # If no filter is passed, return everything
+        cursor.execute('SELECT * FROM orders ORDER BY id DESC')
+        
     orders = cursor.fetchall()
     conn.close()
     
@@ -261,24 +272,6 @@ def remove_order(order_id):
     conn.commit()
     conn.close()
     return jsonify({'message': f'Order {order_id} ({product_name}) successfully removed.', 'removed_id': order_id}), 200
-
-# SPECIAL ROUTE: FILTERING STATUS (NOT WORKING)
-@app.route('/orders', methods=['GET'])
-def filtering_orders():
-    # request.args access parameters for string query
-    filter = request.args.get('status')
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    if filter:
-        cursor.execute('SELECT * FROM orders WHERE status = ? ORDER BY id DESC', (filter,))
-
-    else:
-        cursor.execute('SELECT * FROM orders ORDER BY id DESC')
-
-    orders = cursor.fetchall()
-    conn.close()
-    return jsonify([dict(o) for o in orders])
 
 #running loop
 
