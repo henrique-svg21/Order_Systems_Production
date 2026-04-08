@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<script src="config.js"> </script> 
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -347,239 +349,225 @@
         </section>
     </main>
 
-    <script>
-        // URL API base Flask
-        const API_URL = 'http://localhost:5000';
+</main>
 
-        // ────────────────────────────────────────────────────────
-        async function verifyStatus() {
-            const badge = document.getElementById('status-badge');
-            try {
-                const resp = await fetch(`${API_URL}/status`);
-                const data = await resp.json();
-                // app.py doesn't return total_orders, so we just show it's online
-                badge.textContent = `API Online`;
-                badge.className = 'online';
-            } catch (error) {
-                badge.textContent = 'API Offline';
-                badge.className = 'offline';
-            }
+<script src="config.js"></script> <!--importing variable from file -->
+
+<script>
+    // URL API base Flask
+    const API_URL = 'http://localhost:5000'
+
+    // ────────────────────────────────────────────────────────
+    async function verifyStatus() {
+        const badge = document.getElementById('status-badge');
+        try {
+            // 2. ADD HEADER TO FETCH
+            const resp = await fetch(`${API_URL}/status`, {
+                headers: { 'X-API-Key': API_KEY }
+            });
+            const data = await resp.json();
+            
+            badge.textContent = `API Online`;
+            badge.className = 'online';
+        } catch (error) {
+            badge.textContent = 'API Offline';
+            badge.className = 'offline';
         }
+    }
 
-        async function loadOrders() {
-            const loading = document.getElementById('loading');
-            const noData = document.getElementById('no-data');
-            const table = document.getElementById('orders-table');
-            const corpse = document.getElementById('table-corpse');
+    async function loadOrders() {
+        const loading = document.getElementById('loading');
+        const noData = document.getElementById('no-data');
+        const table = document.getElementById('orders-table');
+        const corpse = document.getElementById('table-corpse');
 
-            // Shows the loading indicator and hide the table
-            loading.classList.remove('ocult');
-            table.classList.add('ocult');
-            noData.classList.add('ocult');
+        loading.classList.remove('ocult');
+        table.classList.add('ocult');
+        noData.classList.add('ocult');
 
-            try {
-                const awnser = await fetch(`${API_URL}/orders`);
-                const orders = await awnser.json();
+        try {
+            // 2. ADD HEADER TO FETCH
+            const awnser = await fetch(`${API_URL}/orders`, {
+                headers: { 'X-API-Key': API_KEY }
+            });
+            const orders = await awnser.json();
 
-                loading.classList.add('ocult');
+            loading.classList.add('ocult');
 
-                // If don't have orders, show message and exit function
-                if (orders.length === 0) {
-                    noData.classList.remove('ocult');
-                    return;
-                }
-
-                // Show table if there is data
-                table.classList.remove('ocult');
-
-                // For every order, create one line <tr> in table
-                corpse.innerHTML = orders.map(order => `
-                    <tr id="line-${order.id}">
-                        <td>${order.id}</td>
-                        <td>${order.product}</td>
-                        <td>${order.quantity}</td>
-                        <td>${renderBadge(order.status)}</td> <td>${order.created_at || ''}</td>
-                        <td>
-                            <select class="select-status"
-                                onchange="updateStatus(${order.id}, this.value)">
-                                <option value="Pending"
-                                    ${order.status === 'Pending' ? 'selected' : ''}>
-                                    Pending
-                                </option>
-                                <option value="In progress"
-                                   ${order.status === 'In progress' ? 'selected' : ''}>
-                                   In progress
-                                </option>
-                                <option value="Complete"
-                                    ${order.status === 'Complete' ? 'selected' : ''}>
-                                    Complete
-                                </option>
-                            </select>
-                            <button class="btn-exclude"
-                                onclick="excludeOrder(${order.id})">
-                              Exclude
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-
-            } catch (error) {
-                loading.classList.add('ocult');
-                console.error('Error in load orders:', error);
-                showMessage('Error to connect with API. The server is playing?', 'error');
-            }
-        }
-
-        // Returns badge HTML coloured by the status
-        function renderBadge(status) {
-            const classes = {
-                'Pending': 'badge badge-pending',
-                'In progress': 'badge badge-inprogress',
-                'Complete': 'badge badge-complete'
-            };
-            const cls = classes[status] || 'badge';
-            return `<span class="${cls}">${status}</span>`;
-        }
-
-        async function createOrder() {
-            // Captures the values from the HTML fields
-            const product = document.getElementById('product').value.trim();
-            const quantity = document.getElementById('quantity').value; 
-            const status = document.getElementById('initial-status').value; 
-
-            // Front-end validation (before calling the API)
-            if (!product) {
-                showMessage('Fill the product name.', 'error');
-                document.getElementById('product').focus();
-                return;
-            }
-            if (!quantity || Number(quantity) <= 0) {
-                showMessage('Inform a valid quantity (positive number).', 'error');
-                document.getElementById('quantity').focus();
+            if (orders.length === 0) {
+                noData.classList.remove('ocult');
                 return;
             }
 
-            // Disables the button to prevent double-clicking
-            const btn = document.getElementById('btn-register');
-            btn.disabled = true;
-            btn.textContent = 'Registering...';
+            table.classList.remove('ocult');
 
-            try {
-                const response = await fetch(`${API_URL}/orders`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        product: product,
-                        quantity: Number(quantity),
-                        status: status
-                    })
-                });
+            corpse.innerHTML = orders.map(order => `
+                <tr id="line-${order.id}">
+                    <td>${order.id}</td>
+                    <td>${order.product}</td>
+                    <td>${order.quantity}</td>
+                    <td>${renderBadge(order.status)}</td> <td>${order.created_at || ''}</td>
+                    <td>
+                        <select class="select-status"
+                            onchange="updateStatus(${order.id}, this.value)">
+                            <option value="Pending" ${order.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="In progress" ${order.status === 'In progress' ? 'selected' : ''}>In progress</option>
+                            <option value="Complete" ${order.status === 'Complete' ? 'selected' : ''}>Complete</option>
+                        </select>
+                        <button class="btn-exclude" onclick="excludeOrder(${order.id})">Exclude</button>
+                    </td>
+                </tr>
+            `).join('');
 
-                const data = await response.json();
-
-                if (response.ok) {
-                    showMessage(`Order #${data.id} registered successfully!`, 'sucess');
-                    clearForm();
-                    await loadOrders();
-                    await verifyStatus(); // FIXED function call
-                } else {
-                    showMessage(data.error || 'Error trying to register.', 'error');
-                }
-            } catch (error) {
-                showMessage('Connection error with the API.', 'error');
-                console.error(error);
-            } finally {
-                btn.disabled = false;
-                btn.textContent = 'Create Order';
-            }
+        } catch (error) {
+            loading.classList.add('ocult');
+            console.error('Error in load orders:', error);
+            showMessage('Error to connect with API.', 'error');
         }
+    }
 
-        // Clears the form fields after a successful registration
-        function clearForm() {
-            document.getElementById('product').value = '';
-            document.getElementById('quantity').value = '';
-            document.getElementById('initial-status').value = 'Pending'; // FIXED ID
-        }
-
-        async function updateStatus(id, newStatus) {
-            try {
-                const response = await fetch(`${API_URL}/orders/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        status: newStatus
-                    })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    showMessage(`Status for Order #${id} updated to '${newStatus}'.`, 'sucess'); // Fixed 'sucess' to match CSS
-
-                    // Updates just the badge in the row without reloading the page
-                    const row = document.getElementById(`line-${id}`);
-                    if (row) {
-                        const tdStatus = row.cells[3];
-                        tdStatus.innerHTML = renderBadge(newStatus);
-                    }
-                    await verifyStatus(); // FIXED function call
-                } else {
-                    showMessage(data.error || 'Error updating status.', 'error');
-                }
-            } catch (error) {
-                showMessage('Connection error with the API.', 'error');
-                console.error(error);
-            }
-        }
-
-        async function excludeOrder(id) {
-            const confirmed = window.confirm(`Are you sure you want to delete Order #${id}? This action is permanent.`);
-            if (!confirmed) return;
-
-            try {
-                // FIXED the route from /ordens/ to /orders/
-                const response = await fetch(`${API_URL}/orders/${id}`, {
-                    method: 'DELETE'
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    showMessage(`Order #${id} deleted successfully!`, 'success');
-                    await loadOrders();
-                    await verifyStatus(); // FIXED function call
-                } else {
-                    showMessage(data.error || 'Error deleting order.', 'error');
-                }
-            } catch (error) {
-                showMessage('Connection error with the API.', 'error');
-                console.error(error);
-            }
-        }
-
-        // Displays feedback messages on the screen
-        function showMessage(text, type) {
-            const div = document.getElementById('message');
-
-            div.textContent = text;
-            div.className = `message ${type}`;
-            div.classList.remove('ocult');
-
-            setTimeout(() => {
-                div.classList.add('ocult');
-            }, 3000);
-        }
-
-        // ADDED: Initialize the app when the page loads
-        window.onload = () => {
-            verifyStatus();
-            loadOrders();
+    function renderBadge(status) {
+        const classes = {
+            'Pending': 'badge badge-pending',
+            'In progress': 'badge badge-inprogress',
+            'Complete': 'badge badge-complete'
         };
-    </script>
-</body>
+        const cls = classes[status] || 'badge';
+        return `<span class="${cls}">${status}</span>`;
+    }
 
+    async function createOrder() {
+        const product = document.getElementById('product').value.trim();
+        const quantity = document.getElementById('quantity').value; 
+        const status = document.getElementById('initial-status').value; 
+
+        if (!product) {
+            showMessage('Fill the product name.', 'error');
+            document.getElementById('product').focus();
+            return;
+        }
+        if (!quantity || Number(quantity) <= 0) {
+            showMessage('Inform a valid quantity (positive number).', 'error');
+            document.getElementById('quantity').focus();
+            return;
+        }
+
+        const btn = document.getElementById('btn-register');
+        btn.disabled = true;
+        btn.textContent = 'Registering...';
+
+        try {
+            const response = await fetch(`${API_URL}/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': API_KEY // 2. ADD HEADER TO FETCH
+                },
+                body: JSON.stringify({
+                    product: product,
+                    quantity: Number(quantity),
+                    status: status
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showMessage(`Order #${data.id} registered successfully!`, 'sucess');
+                clearForm();
+                await loadOrders();
+                await verifyStatus(); 
+            } else {
+                showMessage(data.error || 'Error trying to register.', 'error');
+            }
+        } catch (error) {
+            showMessage('Connection error with the API.', 'error');
+            console.error(error);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Create Order';
+        }
+    }
+
+    function clearForm() {
+        document.getElementById('product').value = '';
+        document.getElementById('quantity').value = '';
+        document.getElementById('initial-status').value = 'Pending'; 
+    }
+
+    async function updateStatus(id, newStatus) {
+        try {
+            const response = await fetch(`${API_URL}/orders/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': API_KEY // 2. ADD HEADER TO FETCH
+                },
+                body: JSON.stringify({
+                    status: newStatus
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showMessage(`Status for Order #${id} updated to '${newStatus}'.`, 'sucess');
+                const row = document.getElementById(`line-${id}`);
+                if (row) {
+                    const tdStatus = row.cells[3];
+                    tdStatus.innerHTML = renderBadge(newStatus);
+                }
+                await verifyStatus(); 
+            } else {
+                showMessage(data.error || 'Error updating status.', 'error');
+            }
+        } catch (error) {
+            showMessage('Connection error with the API.', 'error');
+            console.error(error);
+        }
+    }
+
+    async function excludeOrder(id) {
+        const confirmed = window.confirm(`Are you sure you want to delete Order #${id}? This action is permanent.`);
+        if (!confirmed) return;
+
+        try {
+            const response = await fetch(`${API_URL}/orders/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-API-Key': API_KEY // 2. ADD HEADER TO FETCH
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showMessage(`Order #${id} deleted successfully!`, 'sucess');
+                await loadOrders();
+                await verifyStatus(); 
+            } else {
+                showMessage(data.error || 'Error deleting order.', 'error');
+            }
+        } catch (error) {
+            showMessage('Connection error with the API.', 'error');
+            console.error(error);
+        }
+    }
+
+    function showMessage(text, type) {
+        const div = document.getElementById('message');
+        div.textContent = text;
+        div.className = `message ${type}`;
+        div.classList.remove('ocult');
+        setTimeout(() => {
+            div.classList.add('ocult');
+        }, 3000);
+    }
+
+    window.onload = () => {
+        verifyStatus();
+        loadOrders();
+    };
+</script>
+</body>
 </html>

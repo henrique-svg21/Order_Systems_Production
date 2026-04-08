@@ -1,5 +1,6 @@
 #backend flask: API REST's routes
 from flask import Flask, jsonify, request
+import html
 from flask_cors import CORS
 from functools import wraps
 from database import init_db, get_connection
@@ -147,9 +148,14 @@ def create_order():
     
     # Verifies obligatory field 'product'
     product = data.get('product', '').strip()
+    product = html.escape
     if not product:
         return jsonify({'error': 'Field "product" is mandatory.'}), 400
     
+    #Verifies if product name is shorter than 50
+    if len(product) > 50:
+        return jsonify({'error': 'Product name exceeds maximum length of 50 characters.'}), 400
+
     # Verifies obligatory field 'quantity' 
     quantity = data.get('quantity')
     if quantity is None:
